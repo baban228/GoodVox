@@ -5,11 +5,12 @@ from telegram.ext import ContextTypes
 
 class StateType(IntEnum):
     '''Тут пишутся новые состояния в таком формате, остальное можно не знать'''
-    MAIN_MENU = 0
-    TEXT_GEN = 1
-    IMAGE_GEN = 2
-    COR_TEXT = 3
-    PLAN = 4
+    COLL_INFO = 0
+    MAIN_MENU = 1
+    TEXT_GEN = 2
+    IMAGE_GEN = 3
+    COR_TEXT = 4
+    PLAN = 5
 
 
 class State:
@@ -27,6 +28,9 @@ class StateMachine:
 
     def set_state(self, new_state: 'State'):
         self.current_state = new_state
+
+    def get_state(self):
+        return self.current_state
 
 #состояние меняет
 async def set_user_state(update: Update, context: ContextTypes.DEFAULT_TYPE, state_type: StateType):
