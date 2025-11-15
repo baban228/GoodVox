@@ -1,19 +1,20 @@
 from telegram import Update
 from telegram.ext import ContextTypes
 
+from src.bot.handlers.start import start_function_command
 from src.bot.states import StateType
-from src.bot.commands.text_generation.text_generation_main import text_generation_main
+from src.bot.commands.text_generation.handlers import text_generation_main
 
 async def handle_text_command_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     command = update.message.text.split()[0]
-    '''Тут создаются новые команды'''
+    '''Проверка, какая из команд текстового меню вызывана'''
     if command == "/text_generation":
         return await text_generation_main(update, context)
     elif command == "/image_generator":
-        return await text_generation_main(update, context) #это заглушка
+        return await start_function_command(update, context) #это заглушка
     elif command == "/correct_text":
-        return await text_generation_main(update, context) #это заглушка
+        return await start_function_command(update, context) #это заглушка
     elif command == "/plan":
-        return await text_generation_main(update, context) #это заглушка
+        return await start_function_command(update, context) #это заглушка
     else:
         return StateType.MAIN_MENU
