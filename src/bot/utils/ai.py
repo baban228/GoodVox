@@ -333,6 +333,27 @@ class AI:
         """
         return self.system_prompt
 
+    def parse_qwen_wrapper_response(response: Dict[str, Any]):
+        import json
+
+        # извлечь текст ответа
+        try:
+            choices = response.get("choices") or []
+            if choices:
+                msg = choices[0].get("message") or choices[0]
+                content = msg.get("content")
+                # если content — list rich parts
+                if isinstance(content, list):
+                    text_out = " ".join((p.get("text") or p.get("content") or "") for p in content if isinstance(p, dict))
+                else:
+                    text_out = content if isinstance(content, str) else str(content)
+            else:
+                # fallback
+                text_out = response.get("message") or response.get("result") or response.get("text") or json.dumps(response, ensure_ascii=False)
+        except Exception:
+            text_out = json.dumps(response, ensure_ascii=False)
+        return text_out
+
 def main():
     def parse_raw_response(response: Dict[str, Any]):
         import json
