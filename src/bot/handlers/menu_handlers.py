@@ -3,7 +3,6 @@ from telegram.ext import ContextTypes
 
 from src.bot.handlers.start import start_function_command
 from src.bot.states import StateType
-from src.bot.commands.text_generation.text_generation_main import text_generation_main
 from src.bot.commands.info_of_nko.correct_info.correct_info_nko import show_current_info
 from src.bot.commands.text_generation.handlers import text_generation_main
 

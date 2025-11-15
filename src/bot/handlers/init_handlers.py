@@ -6,16 +6,13 @@ from telegram.ext import (
     ConversationHandler
 )
 
-from src.bot.states import *
 from .start import start_function_command, skip_function
 from .menu_handlers import handle_text_command_selection
-from src.bot.commands.text_generation.handlers import handle_text_generation_messages
 from src.bot.commands.text_generation.handlers import handle_text_generation_messages
 
 from src.bot.commands.info_of_nko.collection_info.collection_info import collection_info
 
 from src.bot.commands.info_of_nko.correct_info.correct_info_nko import *
-from src.bot.commands.settings.main import *
 from src.bot.commands.settings.handlers import *
 logger = logging.getLogger(__name__)
 
