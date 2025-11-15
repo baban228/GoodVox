@@ -12,6 +12,7 @@ class StateType(IntEnum):
     COR_TEXT = 4
     POST_GEN = 5
     PLAN = 6
+    SETTINGS = 7
 
 
 class State:
