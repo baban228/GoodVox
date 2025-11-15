@@ -11,6 +11,7 @@ class StateType(IntEnum):
     IMAGE_GEN = 3
     COR_TEXT = 4
     PLAN = 5
+    SETTINGS = 6
 
 
 class State:
