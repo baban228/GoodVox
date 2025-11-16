@@ -6,8 +6,8 @@ class Info_setting:
         self.what_you_want = {}
 
         # Дефолтные значения
-        self.default_role = 'default'
-        self.default_want = 'default'
+        self.default_role = 'интеллектуальный бот-помощник'
+        self.default_want = ''
 
     def set_role(self, user_id: int, role: str) -> None:
         """Устанавливает роль ИИ для указанного пользователя."""
