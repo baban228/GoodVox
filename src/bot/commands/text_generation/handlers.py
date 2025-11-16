@@ -7,6 +7,7 @@ from src.bot.states import StateType
 from src.bot.utils.action_wrappers import send_typing_action
 from src.bot.utils.ai import AI
 from src.bot.commands.info_of_nko import info_storage
+from config.settings import CLAR_REPEATS
 
 DictInfoTextGen = dict()
 
@@ -58,43 +59,52 @@ async def handle_text_generation_messages(update: Update, context: ContextTypes.
 
     ai = AI(api_url='http://api.ai.laureni.synology.me/api/chat/completions')
 
-    # 1) check for data sufficiency
-    analysis_prompt = f"""
-Ты — эксперт по созданию постов для НКО.
+    if len(session.get_answers()) < CLAR_REPEATS:
+        # 1) check for data sufficiency
+        analysis_sys = f"""
+    Ты — эксперт по созданию постов для НКО. Вот нко пользователя: {info_storage.get_info_as_string(user_id)}
 
-Вот категория поста: {session.get_cat()}
-Вот ранее собранные данные:
-{session.get_answers_as_text()}
+    Твоя задача определить, достаточно ли данных для генерации качественного поста.
 
-Определи, достаточно ли данных для генерации качественного поста.
+    Отвечай строго в JSON:
+    Если достаточно:
+        {{"enough": true}}
+    Если недостаточно:
+        {{"enough": false, "question": "следующий вопрос пользователю"}}
+    Пользователь уаидит тольковопрос, который ты напишешь в "question", так что ничего, кроме json не пиши
+    """
+        analysis_prompt = f"""
+    Вот категория поста: {session.get_cat()}
+    Вот ранее собранные данные:
+    {session.get_first_post_desc()}
+    {session.get_answers_as_text()}
 
-Ответь строго в JSON:
-Если достаточно:
-    {{"enough": true}}
-Если недостаточно:
-    {{"enough": false, "question": "следующий вопрос пользователю"}}
-"""
+    Определи, достаточно ли данных для генерации качественного поста."""
 
-    analysis_raw = await send_typing_action(
-        update, context, ai.generate_text,
-        analysis_prompt,
-        parse_response_callback=ai.parse_qwen_wrapper_response
-    )
+        print(analysis_prompt)
+        analysis_raw = await send_typing_action(
+            update, context, ai.generate_text,
+            analysis_prompt,
+            system_prompt=analysis_sys,
+            parse_response_callback=AI.parse_qwen_wrapper_response
+        )
+        print(analysis_raw)
 
-    # json parse
-    import json
-    try:
-        analysis = json.loads(analysis_raw)
-    except:
-        analysis = {"enough": False, "question": "Можешь уточнить детали?"}
+        # json parse
+        import json
+        try:
+            analysis = json.loads(analysis_raw)
+        except:
+            analysis = {"enough": False, "question": "Можешь уточнить детали?"}
+        print('<-', analysis)
 
-    # 2) creating new question if data insufficiency
-    if not analysis.get("enough"):
-        next_q = analysis.get("question", "Уточни, пожалуйста?")
-        session.current_question = next_q
+        # 2) creating new question if data insufficiency
+        if not analysis.get("enough"):
+            next_q = analysis.get("question", "Уточни, пожалуйста?")
+            session.current_question = next_q
 
-        await update.message.reply_text(next_q)
-        return StateType.TEXT_GEN
+            await update.message.reply_text(next_q)
+            return StateType.TEXT_GEN
 
     # 3) creating post if data sufficiency
     final_prompt = f"""
@@ -109,8 +119,8 @@ async def handle_text_generation_messages(update: Update, context: ContextTypes.
     final_text = await send_typing_action(
         update, context, ai.generate_text,
         final_prompt,
-        system_promt="""Ты — интеллектуальный помощник НКО. Твоя задача — писать достойные, аккуратные, точные посты.""",
-        parse_response_callback=ai.parse_qwen_wrapper_response
+        system_prompt=f"""Ты — интеллектуальный помощник НКО. Твоя задача — писать достойные, аккуратные, точные посты.{info_storage.get_info_as_string(user_id)}""",
+        parse_response_callback=AI.parse_qwen_wrapper_response
     )
 
     await update.message.reply_text(final_text)
