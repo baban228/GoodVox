@@ -16,6 +16,7 @@ class StateType(IntEnum):
 
 
 class State:
+    """Класс пока не используется"""
     def __init__(self, state_type: int):
         self.st: int = state_type
         self.sub_states: list['State'] = []
@@ -23,8 +24,8 @@ class State:
     def add_sub_state(self, sub_state: 'State'):
         self.sub_states.append(sub_state)
 
-
 class StateMachine:
+    """Класс пока не используется"""
     def __init__(self):
         self.current_state: State = None
 
@@ -34,7 +35,8 @@ class StateMachine:
     def get_state(self):
         return self.current_state
 
-#состояние меняет
+# Пока не используется
+# меняет состояние
 async def set_user_state(update: Update, context: ContextTypes.DEFAULT_TYPE, state_type: StateType):
     user_id = update.effective_user.id
     if 'user_states' not in context.bot_data:
