@@ -7,6 +7,7 @@ from src.bot.states import StateType
 from src.bot.utils.action_wrappers import send_typing_action
 from src.bot.utils.ai import AI
 from src.bot.commands.info_of_nko import info_storage
+from config.settings import CLAR_REPEATS
 
 DictInfoTextGen = dict()
 
@@ -58,7 +59,7 @@ async def handle_text_generation_messages(update: Update, context: ContextTypes.
 
     ai = AI(api_url='http://api.ai.laureni.synology.me/api/chat/completions')
 
-    if len(session.get_answers()) < 3:
+    if len(session.get_answers()) < CLAR_REPEATS:
         # 1) check for data sufficiency
         analysis_sys = f"""
     Ты — эксперт по созданию постов для НКО. Вот нко пользователя: {info_storage.get_info_as_string(user_id)}
