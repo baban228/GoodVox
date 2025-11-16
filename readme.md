@@ -72,4 +72,4 @@ GoodVox/
 └── readme.md                     # README файл
 
 Авторы:
-[![Contributors](https://github.com/baban228/GoodVox)](https://github.com/baban228/GoodVox/graphs/contributors)
+![Contributors](https://github.com/baban228/GoodVox/graphs/contributors)
