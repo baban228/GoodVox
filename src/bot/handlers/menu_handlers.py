@@ -7,7 +7,6 @@ from src.bot.states import StateType
 from src.bot.commands.text_generation.handlers import text_generation_main
 from src.bot.commands.image_generation.main import image_generation_main
 from src.bot.commands.info_of_nko.correct_info.correct_info_nko import show_current_info
-#from src.bot.commands.text_generation.handlers import text_generation_main
 from src.bot.commands.correct_text.main import *
 from src.bot.commands.settings.main import *
 from src.bot.commands.post_generation.main import *
