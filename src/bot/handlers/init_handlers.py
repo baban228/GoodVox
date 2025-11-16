@@ -1,43 +1,76 @@
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
-from .start import start_command
 import logging
-from telegram import Update
 from telegram.ext import (
-    ApplicationBuilder,
     CommandHandler,
     MessageHandler,
     filters,
-    ContextTypes,
     ConversationHandler
 )
 
-from src.bot.states import *
-from .start import start_command
+from .start import start_function_command, skip_function
 from .menu_handlers import handle_text_command_selection
+from src.bot.commands.text_generation.handlers import handle_text_generation_messages
+
+from src.bot.commands.info_of_nko.collection_info.collection_info import collection_info
+from src.bot.commands.info_of_nko.correct_info.correct_info_nko import *
+
+from src.bot.commands.settings.handlers import *
+
+from src.bot.commands.image_generation.main import *
+from src.bot.commands.post_generation.handlers import *
+from src.bot.commands.correct_text.main import *
 
 logger = logging.getLogger(__name__)
 
 
 def setup_handlers(app):
-    app.add_handler(CommandHandler("start", start_command))
     conv_handler = ConversationHandler(
-        #тут функции новые записываются это не трогать особо
+        #функции констекстного меню с обработчиками
         entry_points=[
-            CommandHandler("start", start_command),
+            CommandHandler("start", start_function_command),
+            CommandHandler("main_menu", start_function_command),
+            CommandHandler("skip", skip_function),
             CommandHandler("text_generation", handle_text_command_selection),
-            CommandHandler("image_generator", handle_text_command_selection),
+            CommandHandler("image_generation", handle_text_command_selection),
             CommandHandler("correct_text", handle_text_command_selection),
-            CommandHandler("plan", handle_text_command_selection)
+            CommandHandler("post_generation", handle_text_command_selection),
+            CommandHandler("plan", handle_text_command_selection),
+            CommandHandler("correct_info_nko", handle_text_command_selection),
+
+            CommandHandler("settings", settings_info),
+            CommandHandler("set_role", handler_settings_text_command),
+            CommandHandler("set_what_you_want", handler_settings_text_command),
+            CommandHandler("close_settings", handler_settings_text_command),
+
+            CommandHandler("get_nko", show_current_info),
+            CommandHandler("remove_all_nko", remove_all_nko),
+            CommandHandler("remove_last_nko", remove_last_nko)
         ],
-        #тут состояния, тип пока скажем MAIN_MENU будет вызываться всегда handle_text_command_selection, чтоб новое
-        # добавить просто скопируй и замени на свои данные
+        #состояния, MAIN_MENU будет всегда вызывать handle_text_command_selection
+        #               TEXT_GEN вызывает hand
         states={
+            StateType.COLL_INFO: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, collection_info),
+            ],
             StateType.MAIN_MENU: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text_command_selection),
+            ],
+            StateType.TEXT_GEN: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text_generation_messages),
+            ],
+            StateType.SETTINGS: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_settings_messages),
+            ],
+            StateType.IMAGE_GEN: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, generation_image),
+            ],
+            StateType.COR_TEXT: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, regeneration_text),
+            ],
+            StateType.POST_GEN: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, handle_post_messages),
             ]
         },
-        fallbacks=[CommandHandler("start", start_command)],
+        fallbacks=[CommandHandler("start", start_function_command)],
         allow_reentry=True
     )
     app.add_handler(conv_handler)
@@ -48,8 +81,10 @@ def setup_handlers(app):
 async def handle_commands(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     command = update.message.text.split()[0]
-    '''Короч сюда записываем новые функции, тут тип они ищутся'''
-    if command in ["/start", "/text_generation", "/image_generator", "/correct_text", "/plan"]:
+    '''Сюда записываем новые функции, тут они ищутся'''
+    if command in ["/start", "/main_menu", "/skip", "/text_generation", "/image_generation", "/correct_text", "/plan", "/correct_info_nko", "/settings",
+                   "/get_nko", "remove_all_nko", "remove_last_nko",
+                   "set_role", "/set_what_you_want", "close_settings"]:
         return  # Уже обрабатывается
 
     await update.message.reply_text("Команда не распознана")

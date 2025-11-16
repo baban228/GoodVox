@@ -1,0 +1,131 @@
+from telegram import Update, ReplyKeyboardMarkup
+from telegram.ext import ContextTypes
+
+from src.bot.commands.text_generation.InfoTextGen import InfoTextGen
+from src.bot.handlers.start import start_function_command
+from src.bot.states import StateType
+from src.bot.utils.action_wrappers import send_typing_action
+from src.bot.utils.ai import AI
+from src.bot.commands.info_of_nko import info_storage
+from config.settings import CLAR_REPEATS
+
+DictInfoTextGen = dict()
+
+async def text_generation_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Модуль-сценарий для генерации текста"""
+    try:
+        keyboard = [
+            ["Вернуться в главное меню"]
+        ]
+
+        reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
+        await update.message.reply_text("Укажите категорию поста",
+                                        reply_markup=reply_markup)
+
+    except Exception as e:
+        await update.message.reply_text(f"Ошибка: {str(e)}")
+
+    return StateType.TEXT_GEN
+
+async def handle_text_generation_messages(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    text = update.message.text
+    user_id = update.effective_user.id
+
+    # making session with values
+    if user_id not in DictInfoTextGen:
+        DictInfoTextGen[user_id] = InfoTextGen()
+    session = DictInfoTextGen[user_id]
+
+    if text == "Вернуться в главное меню":
+        return await start_function_command(update, context)
+
+    # category fill & first post description request
+    if not session.get_cat():
+        session.set_cat(text)
+        await update.message.reply_text("Опиши, пожалуйста, что должно быть в посте.")
+        return StateType.TEXT_GEN
+
+    # first post description fill
+    if not session.get_first_post_desc():
+        session.set_first_post_desc(text)
+        await update.message.reply_text("Понял. Сейчас уточню детали.")
+        # outgoing to ai ask mode
+        session.set_current_question(None)
+
+    # saving answer
+    if session.current_question:
+        session.add_answer(session.current_question, text)
+
+    ai = AI(api_url='http://api.ai.laureni.synology.me/api/chat/completions')
+
+    if len(session.get_answers()) < CLAR_REPEATS:
+        # 1) check for data sufficiency
+        analysis_sys = f"""
+    Ты — эксперт по созданию постов для НКО. Вот нко пользователя: {info_storage.get_info_as_string(user_id)}
+
+    Твоя задача определить, достаточно ли данных для генерации качественного поста.
+
+    Отвечай строго в JSON:
+    Если достаточно:
+        {{"enough": true}}
+    Если недостаточно:
+        {{"enough": false, "question": "следующий вопрос пользователю"}}
+    Пользователь уаидит тольковопрос, который ты напишешь в "question", так что ничего, кроме json не пиши
+    """
+        analysis_prompt = f"""
+    Вот категория поста: {session.get_cat()}
+    Вот ранее собранные данные:
+    {session.get_first_post_desc()}
+    {session.get_answers_as_text()}
+
+    Определи, достаточно ли данных для генерации качественного поста."""
+
+        print(analysis_prompt)
+        analysis_raw = await send_typing_action(
+            update, context, ai.generate_text,
+            analysis_prompt,
+            system_prompt=analysis_sys,
+            parse_response_callback=AI.parse_qwen_wrapper_response
+        )
+        print(analysis_raw)
+
+        # json parse
+        import json
+        try:
+            analysis = json.loads(analysis_raw)
+        except:
+            analysis = {"enough": False, "question": "Можешь уточнить детали?"}
+        print('<-', analysis)
+
+        # 2) creating new question if data insufficiency
+        if not analysis.get("enough"):
+            next_q = analysis.get("question", "Уточни, пожалуйста?")
+            session.current_question = next_q
+
+            await update.message.reply_text(next_q)
+            return StateType.TEXT_GEN
+
+    # 3) creating post if data sufficiency
+    final_prompt = f"""
+Создай пост категории {session.get_cat()}.
+
+Данные, полученные от пользователя:
+{session.get_answers_as_text()}
+
+Сформируй развернутый текст поста.
+"""
+
+    final_text = await send_typing_action(
+        update, context, ai.generate_text,
+        final_prompt,
+        system_prompt=f"""Ты — интеллектуальный помощник НКО. Твоя задача — писать достойные, аккуратные, точные посты.{info_storage.get_info_as_string(user_id)}""",
+        parse_response_callback=AI.parse_qwen_wrapper_response
+    )
+
+    await update.message.reply_text(final_text)
+
+    session.reset()
+
+    return StateType.TEXT_GEN
+

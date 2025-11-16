@@ -13,8 +13,9 @@ if not TELEGRAM_BOT_TOKEN:
 
 
 DEBUG = True
-
 T2S_USE = False
+
+CLAR_REPEATS = 3
 
 BASE_DIR = Path(__file__).parent.parent
 MEDIA_DIR = BASE_DIR / 'media'
