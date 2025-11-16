@@ -21,55 +21,35 @@
 <br>
 
 ### 📁 Структура проекта
+<pre>
 GoodVox/
-
 ├── src/
-
 │   └── bot/
-
-│       ├── main.py                # Точка входа, инициализация бота
-
-│       ├── states.py              # Определение состояний бота
-
+│       ├── main.py                     # Точка входа, инициализация бота
+│       ├── states.py                   # Определение состояний бота
 │       ├── utils/
-
-│       │   ├── ai.py              # Класс AI для работы с моделями
-
-│       │   └── action_wrappers.py # Выставление chat activity бота
-
+│       │   ├── ai.py                   # Класс AI для работы с моделями
+│       │   └── action_wrappers.py      # Выставление chat activity бота
 │       ├── handlers/
-
-│       │   ├── init_handlers.py   # Инициализация обработчиков
-
-│       │   ├── start.py           # Обработчики стартовых команд
-
-│       │   └── menu_handlers.py   # Обработчик главных команд меню
-
+│       │   ├── init_handlers.py        # Инициализация обработчиков
+│       │   ├── start.py                # Обработчики стартовых команд
+│       │   └── menu_handlers.py        # Обработчик главных команд меню
 │       └── commands/
-
-│           ├── text_generation/   # Модуль генерации текста
-
-│           ├── image_generation/  # Модуль генерации изображений
-
-│           ├── post_generation/   # Модуль создания постов
-
-│           ├── correct_text/      # Модуль редактирования текста
-
-│           ├── settings/          # Модуль настроек пользователя
-
-│           └── info_of_nko/       # Модуль информации об НКО
-
+│           ├── text_generation/        # Модуль генерации текста
+│           ├── image_generation/       # Модуль генерации изображений
+│           ├── post_generation/        # Модуль создания постов
+│           ├── correct_text/           # Модуль редактирования текста
+│           ├── settings/               # Модуль настроек пользователя
+│           └── info_of_nko/            # Модуль информации об НКО
 ├── config/
+│   └──  settings.py                    # Конфигурация приложения
+├── requirements.txt                    # Зависимости проекта
+├── .env                                # Переменные окружения (не в Git)
+├── .gitignore                          # Игнорируемые файлы
+└── readme.md                           # README файл
+</pre>
 
-│   └──  settings.py               # Конфигурация приложения
+<br>
 
-├── requirements.txt               # Зависимости проекта
-
-├── .env                          # Переменные окружения (не в Git)
-
-├── .gitignore                    # Игнорируемые файлы
-
-└── readme.md                     # README файл
-
-Авторы:
-![Contributors](https://github.com/baban228/GoodVox/graphs/contributors)
+### Авторы:  
+[![Contributors](https://contrib.rocks/image?repo=baban228/GoodVox)](https://github.com/baban228/GoodVox/graphs/contributors)
