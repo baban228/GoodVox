@@ -40,7 +40,7 @@ async def skip_function(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 ✏️ /correct_text - редактирование текста
 📅 /plan - создание плана
 🏢 /correct_info_nko - редактировать информацию об НКО
-⚙️ /settings - настройки нейронки
+⚙️ /settings - настройки ИИ
 """
 
     await update.message.reply_text(commands_text)

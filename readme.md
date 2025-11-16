@@ -51,6 +51,5 @@ GoodVox/
 
 <br>
 
-### Авторы:
-
-[![Contributors](https://contrib.rocks/image?repo=baban228/GoodVox)](https://github.com/baban228/GoodVox/graphs/contributors)
+Авторы:
+[![Contributors](https://github.com/baban228/GoodVox)](https://github.com/baban228/GoodVox/graphs/contributors)
