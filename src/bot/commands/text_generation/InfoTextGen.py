@@ -1,6 +1,3 @@
-from telegram import Update
-
-
 class InfoTextGen:
     def __init__(self):
         self.questions = {

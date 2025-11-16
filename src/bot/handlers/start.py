@@ -1,7 +1,8 @@
 from telegram import Update
+from telegram.constants import ParseMode
 from telegram.ext import ContextTypes
 
-from src.bot.states import StateType, set_user_state, StateMachine
+from src.bot.states import StateType
 
 
 async def start_function_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -13,15 +14,16 @@ async def start_function_command(update: Update, context: ContextTypes.DEFAULT_T
 
     welcome_text = f"""🌟 Привет, {update.effective_user.first_name or 'Пользователь'}!
 
-Я — бот, помогающий генерировать контент для НКО. 
+Я — бот, помогающий создавать контент для НКО при помощью ИИ (искусственного интеллекта). 
 Для начала, заполните информацию об организации. 
 Можно присылать текст, картинки и видео одним сообщением. 
 Не волнуйтесь, информацию об организации можно будет изменить в любое время.
 
-❌ /skip - пропустить заполнение
+Нажмите на синюю надпись "/skip" или кнопку "Пропустить" в меню, расположенном рядом с меню смайликов, чтобы пропустить этот этап.
+<b>Предупреждение:</b> при пропуске данного этапа ответы ИИ будут менее точными и обезличенными. 
 """
 
-    await update.message.reply_text(welcome_text)
+    await update.message.reply_text(welcome_text, parse_mode=ParseMode.HTML)
 
     return StateType.COLL_INFO
 
