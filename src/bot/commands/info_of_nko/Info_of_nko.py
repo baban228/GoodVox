@@ -1,7 +1,10 @@
+from src.bot.utils.ai import AI
+
 class Info_of_nko:
     def __init__(self):
         # Словарь: user_id -> список собранных строк, позже заменим на бд
         self._collections = {}
+        self.ai_recicled = ''
 
     def add_info(self, user_id: int, text: str) -> None:
         if user_id not in self._collections:
@@ -27,6 +30,16 @@ class Info_of_nko:
         if info_list:
             return ". ".join(info_list) + "."
         return ""
+    
+    async def recicle_by_ai(self) -> str:
+        ai = AI(api_url='http://api.ai.laureni.synology.me/api/chat/completions',
+            system_prompt='''Ты — пользователь интеллектуального бота-помощника для канала некоммерческой организации (НКО).
+Твоя задача — создавать посты для этого канала.''')
+        self.ai_recicled = await ai.generate_text(
+            f'''Ты — пользователь. Твоя задача — объяснить боту твою некоммерческую организацию(НКО): {self.get_info_as_string()}''',
+                                            parse_response_callback=ai.parse_qwen_wrapper_response)
+        
+        return self.ai_recicled
 
 # Глобальный экземпляр
 info_storage = Info_of_nko()
