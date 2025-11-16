@@ -12,6 +12,8 @@ from src.bot.commands.info_of_nko.correct_info.correct_info_nko import show_curr
 
 #from src.bot.commands.text_generation.handlers import text_generation_main
 
+from src.bot.commands.correct_text.main import *
+
 from src.bot.commands.settings.main import *
 
 async def handle_text_command_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
@@ -22,7 +24,7 @@ async def handle_text_command_selection(update: Update, context: ContextTypes.DE
     elif command == "/image_generator":
         return await image_generation_main(update, context) #это заглушка
     elif command == "/correct_text":
-        return await start_function_command(update, context) #это заглушка
+        return await correct_text_main(update, context) #это заглушка
     elif command == "/plan":
         return await start_function_command(update, context) #это заглушка
     elif command == "/correct_info_nko":

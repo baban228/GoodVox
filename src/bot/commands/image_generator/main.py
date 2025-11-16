@@ -3,6 +3,7 @@ from telegram.ext import ContextTypes
 from typing import Dict, Any
 
 from src.bot.commands.info_of_nko.Info_of_nko import info_storage
+from src.bot.commands.settings.Info_settings import info_setting
 from src.bot.states import *
 from src.bot.utils.action_wrappers import send_upload_photo_action
 from src.bot.utils.ai import AI
@@ -31,9 +32,9 @@ async def generation_image(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     pic_desc = update.message.text.strip()
     user_id = update.effective_user.id
     use_nko_desk = info_storage.get_info_as_string(user_id)
-
+    role_ai = info_setting.get_role(user_id)
     ai = AI(api_url='http://api.ai.laureni.synology.me/api/chat/completions',
-            system_prompt="""Ты — интеллектуальный бот-помощник для канала некоммерческой организации (НКО).
+            system_prompt=f"""Ты — {role_ai} для канала некоммерческой организации (НКО).
 Твоя задача — генерировать посты по запросу пользователя. {use_nko_desk}""")
 
     text = await send_upload_photo_action(update, context, ai.generate_image,

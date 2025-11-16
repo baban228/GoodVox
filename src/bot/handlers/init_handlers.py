@@ -17,6 +17,8 @@ from src.bot.commands.settings.handlers import *
 
 from src.bot.commands.image_generator.main import *
 
+from src.bot.commands.correct_text.main import *
+
 logger = logging.getLogger(__name__)
 
 
@@ -59,6 +61,9 @@ def setup_handlers(app):
             ],
             StateType.IMAGE_GEN: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, generation_image),
+            ],
+            StateType.COR_TEXT: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, regeneration_text),
             ]
         },
         fallbacks=[CommandHandler("start", start_function_command)],
