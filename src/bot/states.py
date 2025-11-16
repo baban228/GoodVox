@@ -4,14 +4,15 @@ from telegram.ext import ContextTypes
 
 
 class StateType(IntEnum):
-    '''Тут пишутся новые состояния в таком формате, остальное можно не знать'''
+    '''Тут состояния'''
     COLL_INFO = 0
     MAIN_MENU = 1
     TEXT_GEN = 2
     IMAGE_GEN = 3
     COR_TEXT = 4
-    PLAN = 5
-    SETTINGS = 6
+    POST_GEN = 5
+    PLAN = 6
+    SETTINGS = 7
 
 
 class State:
