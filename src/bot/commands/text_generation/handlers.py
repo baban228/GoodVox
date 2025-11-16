@@ -39,6 +39,19 @@ async def handle_text_generation_messages(update: Update, context: ContextTypes.
     if text == "Вернуться в главное меню":
         return await start_function_command(update, context)
 
+    # category fill & first post description request
+    if not session.get_cat():
+        session.set_cat(text)
+        await update.message.reply_text("Опиши, пожалуйста, что должно быть в посте.")
+        return StateType.TEXT_GEN
+
+    # first post description fill
+    if not session.get_first_post_desc():
+        session.set_first_post_desc(text)
+        await update.message.reply_text("Понял. Сейчас уточню детали.")
+        # outgoing to ai ask mode
+        session.set_current_question(None)
+
     # saving answer
     if session.current_question:
         session.add_answer(session.current_question, text)
