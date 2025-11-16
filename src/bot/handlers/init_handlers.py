@@ -16,10 +16,13 @@ from .start import start_function_command, skip_function
 from .menu_handlers import handle_text_command_selection
 
 from src.bot.commands.info_of_nko.collection_info.collection_info import collection_info
-
 from src.bot.commands.info_of_nko.correct_info.correct_info_nko import *
+
 from src.bot.commands.settings.main import *
 from src.bot.commands.settings.handlers import *
+
+from src.bot.commands.image_generator.main import *
+
 logger = logging.getLogger(__name__)
 
 
@@ -55,6 +58,9 @@ def setup_handlers(app):
             ],
             StateType.SETTINGS: [
                 MessageHandler(filters.TEXT & ~filters.COMMAND, handle_settings_messages),
+            ],
+            StateType.IMAGE_GEN: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, generation_image),
             ]
         },
         fallbacks=[CommandHandler("start", start_function_command)],

@@ -21,5 +21,12 @@ class Info_of_nko:
         if user_id in self._collections and self._collections[user_id]:
             return self._collections[user_id].pop()
 
+    def get_info_as_string(self, user_id: int) -> str:
+        """Преобразует список информации пользователя в строку с разделением через точку"""
+        info_list = self.get_info(user_id)
+        if info_list:
+            return ". ".join(info_list) + "."
+        return ""
+
 # Глобальный экземпляр
 info_storage = Info_of_nko()
